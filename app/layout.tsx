@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Header } from "@/components/shared/header";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -32,7 +33,10 @@ export default function RootLayout({
       )}
     >
       <body className="font-sans min-h-full flex flex-col">
-        <main className="min-h-screen"> {children}</main>
+        <main className="min-h-screen">
+          <Header />
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -46,9 +46,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  button {
+    cursor: pointer;
+  }
 }
 
-/* як у Archakov06/next-pizza-finished: Nunito на всі елементи */
 * {
   font-family: var(--font-nunito), sans-serif;
 }
@@ -155,7 +157,6 @@ html {
   }
 }
 
-/* лише для @theme (sidebar/chart з shadcn), без перекриття primary/ring */
 :root {
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
