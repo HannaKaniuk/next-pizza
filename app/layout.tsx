@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next Pizza",
+  title: "Croissants",
 };
 
 export default function RootLayout({
@@ -27,12 +27,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        "h-full antialiased font-sans",
+        "h-full font-sans antialiased",
         nunito.variable,
-        geistMono.variable
+        geistMono.variable,
       )}
     >
-      <body className="font-sans min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col font-sans">
         <main className="min-h-screen">
           <Header />
           {children}

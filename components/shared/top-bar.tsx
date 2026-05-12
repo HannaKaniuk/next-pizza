@@ -6,9 +6,15 @@ import { SortPopup } from "./sort-popup";
 
 type Props = {
   className?: string;
+  activeCategoryId: number;
+  onCategoryClick?: (categoryId: number) => void;
 };
 
-export const TopBar: React.FC<Props> = ({ className }) => {
+export const TopBar: React.FC<Props> = ({
+  className,
+  activeCategoryId,
+  onCategoryClick,
+}) => {
   return (
     <div
       className={cn(
@@ -18,7 +24,10 @@ export const TopBar: React.FC<Props> = ({ className }) => {
     >
       <Container className="flex justify-between items-center">
         {" "}
-        <Categories />
+        <Categories
+          activeCategoryId={activeCategoryId}
+          onCategoryClick={onCategoryClick}
+        />
         <SortPopup />
       </Container>
     </div>
