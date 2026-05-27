@@ -4,6 +4,7 @@ import { Title } from "./title";
 import { Button } from "../ui";
 import { Plus } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type Props = {
   id: number;
@@ -23,42 +24,41 @@ export const ProductCard: React.FC<Props> = ({
   imageUrl,
   className,
 }) => {
+  const src = imageUrl || fallbackImageUrl;
+
   return (
-    <div className={className}>
-      <Link href={`/product/${id}`}>
-        <div className="flex h-[260px] justify-center rounded-lg">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={name}
-              width={260}
-              height={260}
-              className="h-full w-full rounded-md object-cover"
-            />
-          ) : (
-            <Image
-              src={fallbackImageUrl}
-              alt="Зображення піци"
-              width={260}
-              height={260}
-              className="h-full w-full rounded-md object-cover"
-            />
-          )}
+    <div className={cn("flex h-full flex-col", className)}>
+      <Link href={`/product/${id}`} className="flex h-full flex-col">
+        <div className="relative h-[260px] w-full shrink-0 overflow-hidden rounded-lg">
+          <Image
+            src={src}
+            alt={name}
+            fill
+            sizes="(max-width: 1200px) 33vw, 320px"
+            className="object-contain"
+          />
         </div>
 
-        <Title text={name} size="sm" className="mt-3 mb-1 font-bold" />
+        <div className="mt-3 flex flex-1 flex-col">
+          <Title
+            text={name}
+            size="sm"
+            className="line-clamp-2 min-h-14 leading-snug font-bold"
+          />
 
-        <p className="text-sm text-gray-400"></p>
+          <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+            <span className="text-[20px] whitespace-nowrap">
+              від <b>{price} грн</b>
+            </span>
 
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-[20px]">
-            від <b>{price} грн</b>
-          </span>
-
-          <Button variant="secondary" className="text-base font-bold">
-            <Plus size={20} className="mr-1" />
-            Додати
-          </Button>
+            <Button
+              variant="secondary"
+              className="shrink-0 text-base font-bold"
+            >
+              <Plus size={20} className="mr-1" />
+              Додати
+            </Button>
+          </div>
         </div>
       </Link>
     </div>

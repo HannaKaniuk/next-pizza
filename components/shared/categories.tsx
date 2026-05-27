@@ -1,19 +1,19 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import type { HomeCategory } from "@/lib/get-categories-with-products";
 
-export const categories = [
-  { id: 1, name: "КРУАСАНИ СЕНДВІЧІ", anchorId: "category-1" },
-  { id: 2, name: "СОЛОДКІ КРУАСАНИ", anchorId: "category-2" },
-] as const;
+type CategoryItem = Pick<HomeCategory, "id" | "name" | "anchorId">;
 
 type Props = {
   className?: string;
+  categories: CategoryItem[];
   activeCategoryId: number;
   onCategoryClick?: (categoryId: number) => void;
 };
 
 export const Categories: React.FC<Props> = ({
   className,
+  categories,
   activeCategoryId,
   onCategoryClick,
 }) => {
@@ -30,9 +30,12 @@ export const Categories: React.FC<Props> = ({
               "text-primary bg-white shadow-md shadow-gray-200",
           )}
           key={category.id}
-          onClick={() => onCategoryClick?.(category.id)}
+          onClick={(event) => {
+            event.preventDefault();
+            onCategoryClick?.(category.id);
+          }}
         >
-          <button>{category.name}</button>
+          {category.name}
         </a>
       ))}
     </div>

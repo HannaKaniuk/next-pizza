@@ -40,12 +40,12 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
     toggle(value);
   };
 
-  const baseList = defaultItems?.length ? defaultItems : items;
+  const collapsedList = defaultItems ?? items.slice(0, limit);
   const list = showAll
-    ? baseList.filter((item) =>
-        item.text.toLowerCase().includes(searchValue.toLowerCase())
+    ? items.filter((item) =>
+        item.text.toLowerCase().includes(searchValue.toLowerCase()),
       )
-    : baseList.slice(0, limit);
+    : collapsedList;
 
   React.useEffect(() => {
     if (defaultValue) {
