@@ -17,6 +17,13 @@ export const Categories: React.FC<Props> = ({
   activeCategoryId,
   onCategoryClick,
 }) => {
+  const [localActiveCategoryId, setLocalActiveCategoryId] =
+    React.useState(activeCategoryId);
+
+  React.useEffect(() => {
+    setLocalActiveCategoryId(activeCategoryId);
+  }, [activeCategoryId]);
+
   return (
     <div
       className={cn("inline-flex gap-1 rounded-2xl bg-gray-50 p-1", className)}
@@ -26,12 +33,13 @@ export const Categories: React.FC<Props> = ({
           href={`#${category.anchorId}`}
           className={cn(
             "flex h-11 items-center rounded-2xl px-5 font-bold",
-            activeCategoryId === category.id &&
+            localActiveCategoryId === category.id &&
               "text-primary bg-white shadow-md shadow-gray-200",
           )}
           key={category.id}
           onClick={(event) => {
             event.preventDefault();
+            setLocalActiveCategoryId(category.id);
             onCategoryClick?.(category.id);
           }}
         >

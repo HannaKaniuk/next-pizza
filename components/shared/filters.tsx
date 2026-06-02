@@ -5,6 +5,7 @@ import { Input } from "../ui";
 import { RangeSlider } from "../ui/range-slider";
 import { CheckboxFiltersGroup } from "./checkbox-filters-group";
 import type { FilterChecboxProps } from "./filter-checkbox";
+import { useFilterIngredients } from "@/hooks/useFilterIngredients";
 
 type Props = {
   className?: string;
@@ -13,6 +14,16 @@ type Props = {
 
 export const Filters: React.FC<Props> = ({ className, ingredients }) => {
   const limit = 6;
+  const {
+    items,
+    defaultItems,
+    showAll,
+    setShowAll,
+    isLoading: isIngredientsLoading,
+  } = useFilterIngredients({
+    initialItems: ingredients,
+    limit,
+  });
 
   return (
     <div
@@ -49,13 +60,16 @@ export const Filters: React.FC<Props> = ({ className, ingredients }) => {
         <RangeSlider min={0} max={700} step={10} value={[0, 700]} />
       </div>
 
-      {ingredients.length > 0 && (
+      {items.length > 0 && (
         <CheckboxFiltersGroup
           className="relative mt-5 rounded-2xl border border-white/70 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]"
           title="Інгрідієнти"
           limit={limit}
-          defaultItems={ingredients.slice(0, limit)}
-          items={ingredients}
+          defaultItems={defaultItems}
+          items={items}
+          showAll={showAll}
+          onShowAllChange={setShowAll}
+          isLoading={isIngredientsLoading}
         />
       )}
     </div>

@@ -1,17 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { productsService, type SearchProduct } from "@/services";
 import { Search } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import { useClickAway, useDebounce } from "react-use";
-
-type SearchProduct = {
-  id: number;
-  name: string;
-  imageUrl: string;
-};
 
 interface Props {
   className?: string;
@@ -23,42 +17,51 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
   const [products, setProducts] = React.useState<SearchProduct[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
+  const requestIdRef = React.useRef(0);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
 
   useClickAway(ref, () => {
     setFocused(false);
   });
 
+  React.useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
   useDebounce(
     async () => {
-      const query = searchQuery.trim();
-
-      if (!query) {
-        setProducts([]);
-        setIsLoading(false);
+      if (!focused) {
         return;
       }
 
+      const query = searchQuery.trim();
+      const requestId = ++requestIdRef.current;
+
       try {
+        abortControllerRef.current?.abort();
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         setIsLoading(true);
-        const response = await fetch(
-          `/api/products/search?query=${encodeURIComponent(query)}`,
-        );
+        const data = await productsService.search(query, controller.signal);
 
-        if (!response.ok) {
-          throw new Error("Search request failed");
+        if (requestId === requestIdRef.current) {
+          setProducts(data);
         }
-
-        const data = (await response.json()) as SearchProduct[];
-        setProducts(data);
       } catch (error) {
-        console.error(error);
-        setProducts([]);
+        if (requestId === requestIdRef.current && !(error instanceof DOMException && error.name === "AbortError")) {
+          setProducts([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (requestId === requestIdRef.current) {
+          setIsLoading(false);
+        }
       }
     },
     250,
-    [searchQuery],
+    [focused, searchQuery],
   );
 
   const onClickItem = () => {
@@ -67,7 +70,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
     setProducts([]);
   };
 
-  const showDropdown = focused && searchQuery.trim().length > 0;
+  const showDropdown = focused;
 
   return (
     <>
@@ -109,7 +112,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
 
             {!isLoading &&
               products.map((product) => (
-                <Link
+                <a
                   onClick={onClickItem}
                   key={product.id}
                   className="hover:bg-primary/10 flex w-full items-center gap-3 px-3 py-2"
@@ -123,7 +126,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
                     height={32}
                   />
                   <span>{product.name}</span>
-                </Link>
+                </a>
               ))}
           </div>
         )}

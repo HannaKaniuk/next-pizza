@@ -26,6 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={cn(
         "h-full font-sans antialiased",
         nunito.variable,

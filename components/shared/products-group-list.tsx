@@ -12,6 +12,7 @@ type Props = {
   sectionId: string;
   className?: string;
   listClassName?: string;
+  eagerImageCount?: number;
   onCategoryVisible?: (categoryId: number) => void;
   items: {
     id: number;
@@ -28,6 +29,7 @@ export const ProductsGroupList: React.FC<Props> = ({
   categoryId,
   sectionId,
   className,
+  eagerImageCount = 0,
   onCategoryVisible,
 }) => {
   const intersectionRef = React.useRef<HTMLDivElement>(null);
@@ -56,6 +58,7 @@ export const ProductsGroupList: React.FC<Props> = ({
             name={product.name}
             imageUrl={product.imageUrl}
             price={product.items[0]?.price ?? 0}
+            priority={index < eagerImageCount}
           />
         ))}
       </div>

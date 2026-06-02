@@ -12,6 +12,7 @@ type Props = {
   price: number;
   imageUrl: string;
   className?: string;
+  priority?: boolean;
 };
 
 const fallbackImageUrl =
@@ -23,6 +24,7 @@ export const ProductCard: React.FC<Props> = ({
   price,
   imageUrl,
   className,
+  priority = false,
 }) => {
   const src = imageUrl || fallbackImageUrl;
 
@@ -34,6 +36,7 @@ export const ProductCard: React.FC<Props> = ({
             src={src}
             alt={name}
             fill
+            priority={priority}
             sizes="(max-width: 1200px) 33vw, 320px"
             className="object-contain"
           />

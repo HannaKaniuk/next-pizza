@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated and tooling files.
+    "lib/generated/prisma/**",
+    "postcss.config.js",
   ]),
   eslintConfigPrettier,
 ]);

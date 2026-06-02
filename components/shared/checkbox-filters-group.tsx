@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useSet } from "react-use";
 
 import { FilterCheckbox, FilterChecboxProps } from "./filter-checkbox";
 import { Input } from "../ui/input";
@@ -17,6 +16,9 @@ type Props = {
   className?: string;
   onChange?: (values: string[]) => void;
   defaultValue?: string[];
+  showAll?: boolean;
+  onShowAllChange?: (value: boolean) => void;
+  isLoading?: boolean;
 };
 
 export const CheckboxFiltersGroup: React.FC<Props> = ({
@@ -28,16 +30,35 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
   className,
   onChange,
   defaultValue,
+  showAll: controlledShowAll,
+  onShowAllChange,
+  isLoading = false,
 }) => {
-  const [showAll, setShowAll] = React.useState(false);
+  const [internalShowAll, setInternalShowAll] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
-  const [selected, { add, toggle }] = useSet<string>(new Set([]));
+  const [selected, setSelected] = React.useState<Set<string>>(
+    () => new Set(defaultValue ?? []),
+  );
+  const showAll = controlledShowAll ?? internalShowAll;
+
+  const setShowAll = (value: boolean) => {
+    setInternalShowAll(value);
+    onShowAllChange?.(value);
+  };
 
   const onChangeSearchInput = (value: string) => {
     setSearchValue(value);
   };
   const onCheckedChange = (value: string) => {
-    toggle(value);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) {
+        next.delete(value);
+      } else {
+        next.add(value);
+      }
+      return next;
+    });
   };
 
   const collapsedList = defaultItems ?? items.slice(0, limit);
@@ -48,14 +69,12 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
     : collapsedList;
 
   React.useEffect(() => {
-    if (defaultValue) {
-      defaultValue.forEach(add);
-    }
-  }, [defaultValue?.length]);
+    setSelected(new Set(defaultValue ?? []));
+  }, [defaultValue]);
 
   React.useEffect(() => {
     onChange?.(Array.from(selected));
-  }, [selected]);
+  }, [onChange, selected]);
 
   return (
     <div className={className}>
@@ -68,6 +87,11 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
             placeholder={searchInputPlaceholder}
             className="border-white/70 bg-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]"
           />
+          {isLoading && (
+            <p className="mt-2 text-xs text-neutral-500">
+              Завантажуємо інгредієнти...
+            </p>
+          )}
         </div>
       )}
 

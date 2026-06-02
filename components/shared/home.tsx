@@ -18,6 +18,8 @@ type Props = {
 export const Home: React.FC<Props> = ({ categories, ingredients }) => {
   const activeCategoryId = useCategoryStore((state) => state.activeId);
   const setActiveCategoryId = useCategoryStore((state) => state.setActiveId);
+  const isCategoryClickScrollingRef = React.useRef(false);
+  const categoryClickTimeoutRef = React.useRef<number | null>(null);
 
   const initialCategoryId = categories[0]?.id ?? 1;
 
@@ -25,18 +27,42 @@ export const Home: React.FC<Props> = ({ categories, ingredients }) => {
     setActiveCategoryId(initialCategoryId);
   }, [initialCategoryId, setActiveCategoryId]);
 
+  React.useEffect(() => {
+    return () => {
+      if (categoryClickTimeoutRef.current !== null) {
+        window.clearTimeout(categoryClickTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const totalProducts = categories.reduce(
     (sum, category) => sum + category.products.length,
     0,
   );
 
   const handleCategoryClick = (categoryId: number) => {
+    isCategoryClickScrollingRef.current = true;
+    if (categoryClickTimeoutRef.current !== null) {
+      window.clearTimeout(categoryClickTimeoutRef.current);
+    }
+    categoryClickTimeoutRef.current = window.setTimeout(() => {
+      isCategoryClickScrollingRef.current = false;
+      categoryClickTimeoutRef.current = null;
+    }, 700);
+
     setActiveCategoryId(categoryId);
 
     const sectionElement = document.getElementById(`category-${categoryId}`);
     if (!sectionElement) return;
 
     sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleCategoryVisible = (categoryId: number) => {
+    if (isCategoryClickScrollingRef.current) {
+      return;
+    }
+    setActiveCategoryId(categoryId);
   };
 
   return (
@@ -58,13 +84,14 @@ export const Home: React.FC<Props> = ({ categories, ingredients }) => {
           </div>
           <div className="flex-1">
             <div className="flex flex-col gap-16">
-              {categories.map((category) => (
+              {categories.map((category, categoryIndex) => (
                 <ProductsGroupList
                   key={category.id}
                   title={category.name}
                   categoryId={category.id}
                   sectionId={category.anchorId}
-                  onCategoryVisible={setActiveCategoryId}
+                  eagerImageCount={categoryIndex === 0 ? 3 : 0}
+                  onCategoryVisible={handleCategoryVisible}
                   items={category.products.map((product) => ({
                     id: product.id,
                     name: product.name,
