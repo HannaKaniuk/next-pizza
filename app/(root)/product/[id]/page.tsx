@@ -36,20 +36,23 @@ export default async function ProductPage({ params }: Props) {
   return (
     <Container className="py-10">
       <div className="grid grid-cols-2 gap-10">
-        <div className="relative min-h-[420px] overflow-hidden rounded-3xl bg-gray-50">
+        <div className="relative">
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-contain p-8"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain"
             priority
           />
         </div>
 
         <div>
           <p className="mb-2 text-sm text-gray-500">{product.category.name}</p>
-          <Title text={product.name} size="lg" className="mb-6 font-extrabold" />
+          <Title
+            text={product.name}
+            size="lg"
+            className="mb-6 font-extrabold"
+          />
 
           <p className="mb-3 text-sm text-gray-500">Ціна від</p>
           <p className="mb-8 text-3xl font-black">
@@ -61,12 +64,21 @@ export default async function ProductPage({ params }: Props) {
               <p className="mb-3 text-sm text-gray-500">Інгредієнти</p>
               <div className="flex flex-wrap gap-2">
                 {product.ingredients.map((ingredient) => (
-                  <span
+                  <div
                     key={ingredient.id}
-                    className="rounded-xl bg-gray-100 px-3 py-2 text-sm"
+                    className="flex items-center gap-2 rounded-xl bg-gray-100 px-2 py-2 text-sm"
                   >
-                    {ingredient.name}
-                  </span>
+                    <Image
+                      src={ingredient.imageUrl}
+                      alt={ingredient.name}
+                      width={36}
+                      height={36}
+                      className="rounded-lg object-cover"
+                    />
+                    <span className="pr-1 leading-tight">
+                      {ingredient.name}
+                    </span>
+                  </div>
                 ))}
               </div>
             </>

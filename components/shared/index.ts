@@ -9,3 +9,5 @@ export { Filters } from "./filters";
 export { CheckboxFiltersGroup } from "./checkbox-filters-group";
 export { SearchInput } from "./search-input";
 export { Home } from "./home";
+export { ChoosePizzaForm } from "./choose-product-form";
+export * from "./modals";

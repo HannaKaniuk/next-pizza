@@ -97,6 +97,62 @@ async function up() {
     },
   });
 
+  const assignIngredientIds = (productId: number, totalIngredients = 4) => {
+    const result: number[] = [];
+    for (let i = 0; i < totalIngredients; i++) {
+      result.push(((productId + i) % ingredients.length) + 1);
+    }
+    return result;
+  };
+
+  // Ensure every product has at least one price option.
+  const productsWithoutItems = await prisma.product.findMany({
+    where: {
+      items: {
+        none: {},
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (productsWithoutItems.length > 0) {
+    await prisma.productItem.createMany({
+      data: productsWithoutItems.map(({ id }) =>
+        generateProductItem({
+          productId: id,
+        }),
+      ),
+    });
+  }
+
+  // Ensure all croissants (categoryId = 1) have ingredients.
+  const croissantsWithoutIngredients = await prisma.product.findMany({
+    where: {
+      categoryId: 1,
+      ingredients: {
+        none: {},
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  for (const { id } of croissantsWithoutIngredients) {
+    await prisma.product.update({
+      where: { id },
+      data: {
+        ingredients: {
+          connect: assignIngredientIds(id).map((ingredientId) => ({
+            id: ingredientId,
+          })),
+        },
+      },
+    });
+  }
+
   await prisma.productItem.createMany({
     data: [
       // Цезар з куркою

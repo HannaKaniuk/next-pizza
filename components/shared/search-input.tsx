@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { productsService, type SearchProduct } from "@/services";
 import { Search } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { useClickAway, useDebounce } from "react-use";
@@ -112,7 +113,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
 
             {!isLoading &&
               products.map((product) => (
-                <a
+                <Link
                   onClick={onClickItem}
                   key={product.id}
                   className="hover:bg-primary/10 flex w-full items-center gap-3 px-3 py-2"
@@ -126,7 +127,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
                     height={32}
                   />
                   <span>{product.name}</span>
-                </a>
+                </Link>
               ))}
           </div>
         )}

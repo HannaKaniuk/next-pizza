@@ -68,7 +68,7 @@ export const Home: React.FC<Props> = ({ categories, ingredients }) => {
   return (
     <>
       <Container className="mt-10">
-        <Title text="Всі піцци" size="lg" className="font-extrabold" />
+        <Title text="" />
       </Container>
 
       <TopBar

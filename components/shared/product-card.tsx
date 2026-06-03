@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Title } from "./title";
@@ -30,7 +32,13 @@ export const ProductCard: React.FC<Props> = ({
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
-      <Link href={`/product/${id}`} className="flex h-full flex-col">
+      <Link
+        href={`/product/${id}`}
+        className="flex h-full flex-col"
+        onClick={() => {
+          console.log("[card] navigate to product", { id, name });
+        }}
+      >
         <div className="relative h-[260px] w-full shrink-0 overflow-hidden rounded-lg">
           <Image
             src={src}
