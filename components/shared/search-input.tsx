@@ -52,7 +52,10 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
           setProducts(data);
         }
       } catch (error) {
-        if (requestId === requestIdRef.current && !(error instanceof DOMException && error.name === "AbortError")) {
+        if (
+          requestId === requestIdRef.current &&
+          !(error instanceof DOMException && error.name === "AbortError")
+        ) {
           setProducts([]);
         }
       } finally {
@@ -75,9 +78,7 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
 
   return (
     <>
-      {focused && (
-        <div className="fixed inset-0 z-30 bg-black/50" />
-      )}
+      {focused && <div className="fixed inset-0 z-30 bg-black/50" />}
 
       <div
         ref={ref}
@@ -108,7 +109,9 @@ export const SearchInput: React.FC<Props> = ({ className }) => {
             )}
 
             {!isLoading && products.length === 0 && (
-              <p className="px-3 py-2 text-sm text-gray-400">Нічого не знайдено</p>
+              <p className="px-3 py-2 text-sm text-gray-400">
+                Нічого не знайдено
+              </p>
             )}
 
             {!isLoading &&

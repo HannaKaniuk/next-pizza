@@ -1,9 +1,7 @@
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 import React from "react";
-
-const fallbackImageUrl =
-  "https://i.pinimg.com/1200x/87/5b/82/875b82303a4108c6a2500fe7518d6ec4.jpg";
+import { PRODUCT_FALLBACK_IMAGE_URL } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface Props {
   className?: string;
@@ -16,7 +14,7 @@ export const ProductImage: React.FC<Props> = ({
   alt = "Product",
   className,
 }) => {
-  const src = imageUrl || fallbackImageUrl;
+  const src = imageUrl || PRODUCT_FALLBACK_IMAGE_URL;
 
   return (
     <div

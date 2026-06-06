@@ -2,40 +2,54 @@
 
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
-import { cn } from "@/lib/utils";
-import type { Ingredient, ProductItem } from "@/lib/generated/prisma";
 import { ShoppingCart } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PRODUCT_FALLBACK_IMAGE_URL } from "@/lib/constants";
+import type { ProductItem } from "@/lib/generated/prisma";
+import { cn } from "@/lib/utils";
+import { useCartStore } from "@/store/cart";
 import { Button } from "../ui";
 import { ProductImage } from "./product-image";
 import { Title } from "./title";
 
-const fallbackImageUrl =
-  "https://i.pinimg.com/1200x/87/5b/82/875b82303a4108c6a2500fe7518d6ec4.jpg";
+type ProductIngredient = {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+};
 
 type Props = {
   className?: string;
   imageUrl: string;
   name: string;
-  ingredients: Ingredient[];
-  items: ProductItem[];
+  ingredients: ProductIngredient[];
+  items: Pick<
+    ProductItem,
+    "id" | "price" | "size" | "productType" | "productId"
+  >[];
+  detailsLoading?: boolean;
+  onAddToCartSuccess?: () => void;
 };
 
-export const ChoosePizzaForm: React.FC<Props> = ({
+export const ChooseProductForm: React.FC<Props> = ({
   className,
   imageUrl,
   name,
   ingredients,
   items,
+  detailsLoading = false,
+  onAddToCartSuccess,
 }) => {
   const [selectedIngredientIds, setSelectedIngredientIds] = useState<
     Set<number>
   >(() => new Set());
+  const [adding, setAdding] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
 
   const baseItem = useMemo(() => {
     if (!items.length) return null;
-    return items.reduce((min, item) =>
-      item.price < min.price ? item : min,
-    );
+    return items.reduce((min, item) => (item.price < min.price ? item : min));
   }, [items]);
 
   const totalPrice = useMemo(() => {
@@ -60,8 +74,25 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     });
   };
 
-  const textDetails =
-    baseItem !== null
+  const handleAddToCart = async () => {
+    if (!baseItem) return;
+
+    setAdding(true);
+    try {
+      await addItem({
+        productItemId: baseItem.id,
+        ingredientIds: Array.from(selectedIngredientIds),
+        quantity: 1,
+      });
+      onAddToCartSuccess?.();
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const textDetails = detailsLoading
+    ? "Завантажуємо опції..."
+    : baseItem !== null
       ? `від ${baseItem.price} грн · ${ingredients.length} інгредієнтів`
       : `${ingredients.length} інгредієнтів`;
 
@@ -73,7 +104,18 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
         <p className="text-gray-400">{textDetails}</p>
 
-        {ingredients.length > 0 && (
+        {detailsLoading && (
+          <div className="mt-6 space-y-3">
+            <Skeleton className="h-4 w-40" />
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-32 rounded-xl" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!detailsLoading && ingredients.length > 0 && (
           <div className="mt-6">
             <p className="mb-3 text-sm text-gray-500">Додаткові інгредієнти</p>
             <div className="flex flex-wrap gap-2">
@@ -88,12 +130,12 @@ export const ChoosePizzaForm: React.FC<Props> = ({
                     className={cn(
                       "flex items-center gap-2 rounded-xl px-2 py-2 text-left text-sm shadow-sm transition-colors",
                       isSelected
-                        ? "bg-primary/10 ring-2 ring-primary"
+                        ? "bg-primary/10 ring-primary ring-2"
                         : "bg-white hover:bg-white/80",
                     )}
                   >
                     <Image
-                      src={ingredient.imageUrl || fallbackImageUrl}
+                      src={ingredient.imageUrl || PRODUCT_FALLBACK_IMAGE_URL}
                       alt={ingredient.name}
                       width={36}
                       height={36}
@@ -113,19 +155,24 @@ export const ChoosePizzaForm: React.FC<Props> = ({
         )}
 
         <div className="mt-auto pt-10">
-          {baseItem !== null && (
-            <p className="mb-4 text-[28px] font-black">
-              {totalPrice} <span className="text-xl">грн</span>
-            </p>
+          {detailsLoading ? (
+            <Skeleton className="mb-4 h-10 w-32" />
+          ) : (
+            baseItem !== null && (
+              <p className="mb-4 text-[28px] font-black">
+                {totalPrice} <span className="text-xl">грн</span>
+              </p>
+            )
           )}
 
           <Button
             type="button"
             className="h-14 w-full text-base font-bold"
-            disabled={!baseItem}
+            disabled={detailsLoading || !baseItem || adding}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="mr-2 h-5 w-5" strokeWidth={2} />
-            Додати в кошик
+            {adding ? "Додаємо..." : "Додати в кошик"}
           </Button>
         </div>
       </div>

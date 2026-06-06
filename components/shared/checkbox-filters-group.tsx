@@ -14,6 +14,7 @@ type Props = {
   limit?: number;
   searchInputPlaceholder?: string;
   className?: string;
+  idPrefix?: string;
   onChange?: (values: string[]) => void;
   defaultValue?: string[];
   showAll?: boolean;
@@ -28,6 +29,7 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
   limit = 5,
   searchInputPlaceholder = "Пошук...",
   className,
+  idPrefix = "ingredients",
   onChange,
   defaultValue,
   showAll: controlledShowAll,
@@ -50,15 +52,14 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
     setSearchValue(value);
   };
   const onCheckedChange = (value: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(value)) {
-        next.delete(value);
-      } else {
-        next.add(value);
-      }
-      return next;
-    });
+    const next = new Set(selected);
+    if (next.has(value)) {
+      next.delete(value);
+    } else {
+      next.add(value);
+    }
+    setSelected(next);
+    onChange?.(Array.from(next));
   };
 
   const collapsedList = defaultItems ?? items.slice(0, limit);
@@ -71,10 +72,6 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
   React.useEffect(() => {
     setSelected(new Set(defaultValue ?? []));
   }, [defaultValue]);
-
-  React.useEffect(() => {
-    onChange?.(Array.from(selected));
-  }, [onChange, selected]);
 
   return (
     <div className={className}>
@@ -98,6 +95,7 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
       <div className="flex flex-col gap-4 max-h-96 pr-2 overflow-auto scrollbar">
         {list.map((item) => (
           <FilterCheckbox
+            idPrefix={idPrefix}
             onCheckedChange={() => onCheckedChange(item.value)}
             checked={selected.has(item.value)}
             key={String(item.value)}

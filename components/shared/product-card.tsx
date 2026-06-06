@@ -2,11 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Title } from "./title";
 import { Button } from "../ui";
 import { Plus } from "lucide-react";
 import Image from "next/image";
+import { PRODUCT_FALLBACK_IMAGE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useProductModalStore } from "@/store/product-modal";
+import { apiClient } from "@/services/api-client";
+import type { ProductForModal } from "./modals/product-modal.types";
 
 type Props = {
   id: number;
@@ -17,9 +22,6 @@ type Props = {
   priority?: boolean;
 };
 
-const fallbackImageUrl =
-  "https://i.pinimg.com/1200x/87/5b/82/875b82303a4108c6a2500fe7518d6ec4.jpg";
-
 export const ProductCard: React.FC<Props> = ({
   id,
   name,
@@ -28,16 +30,23 @@ export const ProductCard: React.FC<Props> = ({
   className,
   priority = false,
 }) => {
-  const src = imageUrl || fallbackImageUrl;
+  const router = useRouter();
+  const setPreview = useProductModalStore((s) => s.setPreview);
+  const src = imageUrl || PRODUCT_FALLBACK_IMAGE_URL;
+  const productHref = `/product/${id}`;
+
+  const prefetchProduct = () => {
+    router.prefetch(productHref);
+    void apiClient.get<ProductForModal>(`/api/products/${id}`).catch(() => {});
+  };
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
       <Link
-        href={`/product/${id}`}
+        href={productHref}
         className="flex h-full flex-col"
-        onClick={() => {
-          console.log("[card] navigate to product", { id, name });
-        }}
+        onMouseEnter={prefetchProduct}
+        onClick={() => setPreview({ id, name, imageUrl })}
       >
         <div className="relative h-[260px] w-full shrink-0 overflow-hidden rounded-lg">
           <Image

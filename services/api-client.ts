@@ -1,21 +1,45 @@
 import { AxiosError, type AxiosRequestConfig } from "axios";
 import { api } from "@/services/instance";
 
+type ApiErrorBody = {
+  message?: string;
+  code?: string;
+  needsVerification?: boolean;
+  email?: string;
+};
+
 export class ApiClientError extends Error {
   readonly status?: number;
+  readonly code?: string;
+  readonly needsVerification?: boolean;
+  readonly email?: string;
 
-  constructor(message: string, status?: number) {
+  constructor(
+    message: string,
+    status?: number,
+    extras?: Pick<ApiErrorBody, "code" | "needsVerification" | "email">,
+  ) {
     super(message);
     this.name = "ApiClientError";
     this.status = status;
+    this.code = extras?.code;
+    this.needsVerification = extras?.needsVerification;
+    this.email = extras?.email;
   }
 }
 
 const toApiClientError = (error: unknown): ApiClientError => {
   if (error instanceof AxiosError) {
+    const data = error.response?.data as ApiErrorBody | undefined;
+
     return new ApiClientError(
-      error.response?.data?.message ?? error.message,
+      data?.message ?? error.message,
       error.response?.status,
+      {
+        code: data?.code,
+        needsVerification: data?.needsVerification,
+        email: data?.email,
+      },
     );
   }
 

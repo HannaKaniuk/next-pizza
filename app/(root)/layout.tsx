@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Header } from "@/components/shared";
+import { ProductModalHost } from "@/components/shared/product-modal-host";
 
 export const metadata: Metadata = {
   title: "Croissants",
@@ -18,6 +19,7 @@ export default function HomeLayout({
       <Header />
       {children}
       {modal}
+      <ProductModalHost />
     </>
   );
 }

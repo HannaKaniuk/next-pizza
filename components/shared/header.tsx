@@ -1,12 +1,10 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Container } from "./container";
-import { Button } from "../ui";
-import { User } from "lucide-react";
-import { ShoppingCart } from "lucide-react";
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SearchInput } from "./search-input";
+import { CartButton } from "./cart-button";
+import { ProfileButton } from "./profile-button";
 
 type Props = {
   className?: string;
@@ -29,20 +27,8 @@ export const Header: React.FC<Props> = ({ className }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="flex items-center gap-1">
-            <User size={16} /> Увійти
-          </Button>
-          <div>
-            <Button className="group relative">
-              <b>520 грн</b>
-              <span className="mx-3 h-full w-[1px] bg-white/30"></span>
-              <div className="flex items-center gap-1 transition duration-300 group-hover:opacity-0">
-                <ShoppingCart className="relative h-4 w-4" strokeWidth={2} />
-                <b>3</b>
-              </div>
-              <ArrowRight className="absolute right-5 w-5 -translate-x-2 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
-            </Button>
-          </div>
+          <ProfileButton />
+          <CartButton />
         </div>
       </Container>
     </header>
