@@ -1,20 +1,23 @@
+import { APP_NAME } from "@/lib/app-config";
+
+export function isEmailDeliveryConfigured() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
 export function isDevEmailMode() {
-  return !process.env.RESEND_API_KEY && process.env.NODE_ENV !== "production";
+  return !isEmailDeliveryConfigured() && process.env.NODE_ENV !== "production";
 }
 
 export async function sendVerificationEmail(to: string, code: string) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+  const from =
+    process.env.EMAIL_FROM ?? `${APP_NAME} <onboarding@resend.dev>`;
 
   if (!apiKey) {
-    if (isDevEmailMode()) {
-      console.info(
-        `[dev] Код підтвердження для ${to}: ${code} (дійсний 15 хв)`,
-      );
-      return;
-    }
-
-    throw new Error("RESEND_API_KEY is not configured");
+    console.info(
+      `[auth] Код підтвердження для ${to}: ${code} (дійсний 15 хв)`,
+    );
+    return;
   }
 
   const response = await fetch("https://api.resend.com/emails", {
@@ -26,7 +29,7 @@ export async function sendVerificationEmail(to: string, code: string) {
     body: JSON.stringify({
       from,
       to: [to],
-      subject: "Код підтвердження — Next Pizza",
+      subject: `Код підтвердження — ${APP_NAME}`,
       html: `
         <p>Вітаємо!</p>
         <p>Ваш код підтвердження: <strong style="font-size:24px;letter-spacing:2px">${code}</strong></p>

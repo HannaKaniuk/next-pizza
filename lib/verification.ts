@@ -11,6 +11,17 @@ export function isVerificationCodeExpired(createdAt: Date) {
   return Date.now() - createdAt.getTime() > VERIFICATION_CODE_TTL_MS;
 }
 
+export async function verifyUserImmediately(userId: number) {
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { verified: new Date() },
+    });
+
+    await tx.verificationCode.deleteMany({ where: { userId } });
+  });
+}
+
 export async function createOrRefreshVerificationCode(
   userId: number,
   email: string,

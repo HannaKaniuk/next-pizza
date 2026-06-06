@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { APP_NAME, APP_TAGLINE } from "@/lib/app-config";
 import React from "react";
 import { Container } from "./container";
 import Link from "next/link";
@@ -17,8 +18,8 @@ export const Header: React.FC<Props> = ({ className }) => {
         <Link href="/">
           <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-2xl font-black uppercase">Croissants</h1>
-              <p className="text-sm leading-3 text-gray-400">смачніше нікуди</p>
+              <h1 className="text-2xl font-black uppercase">{APP_NAME}</h1>
+              <p className="text-sm leading-3 text-gray-400">{APP_TAGLINE}</p>
             </div>
           </div>
         </Link>

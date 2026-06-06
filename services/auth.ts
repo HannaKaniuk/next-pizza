@@ -7,7 +7,7 @@ type VerificationResponse = {
 };
 
 export type RegisterResponse = VerificationResponse & {
-  needsVerification: true;
+  needsVerification: boolean;
 };
 
 export const authService = {

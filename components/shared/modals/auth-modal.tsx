@@ -110,7 +110,13 @@ export const AuthModal: React.FC<Props> = ({ open, onOpenChange, className }) =>
 
       if (mode === "register") {
         const response = await authService.register(fullName, email, password);
-        goToVerify(response.email, response.message, response.devCode);
+
+        if (response.needsVerification) {
+          goToVerify(response.email, response.message, response.devCode);
+          return;
+        }
+
+        await credentialsSignIn({ email, password });
         return;
       }
 

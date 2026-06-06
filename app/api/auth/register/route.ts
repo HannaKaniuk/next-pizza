@@ -1,8 +1,14 @@
 import { hash } from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/prisma/prisma-client";
-import { isDevEmailMode } from "@/lib/send-verification-email";
-import { createOrRefreshVerificationCode } from "@/lib/verification";
+import {
+  isDevEmailMode,
+  isEmailDeliveryConfigured,
+} from "@/lib/send-verification-email";
+import {
+  createOrRefreshVerificationCode,
+  verifyUserImmediately,
+} from "@/lib/verification";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,6 +59,16 @@ export async function POST(req: NextRequest) {
           fullName: String(fullName).trim(),
           password: await hash(String(password), 10),
         },
+      });
+    }
+
+    if (!isEmailDeliveryConfigured()) {
+      await verifyUserImmediately(user.id);
+
+      return NextResponse.json({
+        needsVerification: false,
+        email: normalizedEmail,
+        message: "Реєстрація успішна",
       });
     }
 
